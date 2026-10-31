@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Toaster } from './components/ui';
 import { campaign } from './config/campaign';
+import { DEMO_MODE } from './lib/api';
 import { SessionProvider } from './lib/session';
 import { Landing } from './pages/Landing';
 
@@ -15,6 +16,11 @@ export function App() {
   return (
     <BrowserRouter>
       <SessionProvider>
+        {DEMO_MODE && (
+          <p className="bg-gold py-1 text-center text-xs font-semibold text-ink">
+            {campaign.demoNotice}
+          </p>
+        )}
         <Suspense fallback={null}>
           <Routes>
             <Route path="/" element={<Landing />} />

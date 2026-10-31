@@ -15,6 +15,7 @@ export const campaign = {
   startsAt: '2026-11-01T00:00:00+05:30',
   endsAt: '2026-12-01T00:00:00+05:30',
   phonePrefix: '+91',
+  demoNotice: 'Demo only. No real rewards. Scores stay on this device.',
   game: {
     getReady: 'GET READY...',
     go: 'GO!',
