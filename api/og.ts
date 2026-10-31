@@ -1,6 +1,6 @@
 import { ImageResponse } from '@vercel/og';
 import type { ReactElement } from 'react';
-import { campaign } from '../src/config/campaign.ts';
+import { campaign } from '../src/config/campaign.js';
 
 export const config = { runtime: 'edge' };
 
