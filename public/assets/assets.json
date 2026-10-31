@@ -1,0 +1,45 @@
+{
+  "basePath": "/assets/",
+  "images": [
+    { "key": "bg_battlefield", "file": "bg_battlefield.webp", "ready": false },
+    { "key": "boss_body", "file": "boss_body.webp", "ready": false },
+    { "key": "head_01", "file": "head_01.webp", "ready": false },
+    { "key": "head_02", "file": "head_02.webp", "ready": false },
+    { "key": "head_03", "file": "head_03.webp", "ready": false },
+    { "key": "head_04", "file": "head_04.webp", "ready": false },
+    { "key": "head_05", "file": "head_05.webp", "ready": false },
+    { "key": "head_06", "file": "head_06.webp", "ready": false },
+    { "key": "head_07", "file": "head_07.webp", "ready": false },
+    { "key": "head_08", "file": "head_08.webp", "ready": false },
+    { "key": "head_09", "file": "head_09.webp", "ready": false },
+    { "key": "head_10", "file": "head_10.webp", "ready": false },
+    { "key": "head_laugh", "file": "head_laugh.webp", "ready": false },
+    { "key": "bow", "file": "bow.webp", "ready": false },
+    { "key": "arrow", "file": "arrow.webp", "ready": false },
+    { "key": "fx_ember", "file": "fx_ember.png", "ready": false },
+    { "key": "fx_spark", "file": "fx_spark.png", "ready": false },
+    { "key": "fx_smoke", "file": "fx_smoke.png", "ready": false },
+    { "key": "hit_burst", "file": "hit_burst.png", "ready": false },
+    { "key": "logo", "file": "logo.webp", "ready": false },
+    { "key": "hero_bow", "file": "hero_bow.webp", "ready": false },
+    { "key": "results_bg", "file": "results_bg.webp", "ready": false },
+    { "key": "reward_icon", "file": "reward_icon.webp", "ready": false }
+  ],
+  "audio": [
+    { "key": "bgm_loop", "files": ["bgm_loop.m4a", "bgm_loop.ogg"], "ready": false },
+    { "key": "sfx_countdown", "files": ["sfx_countdown.m4a", "sfx_countdown.ogg"], "ready": false },
+    { "key": "sfx_go", "files": ["sfx_go.m4a", "sfx_go.ogg"], "ready": false },
+    { "key": "sfx_draw", "files": ["sfx_draw.m4a", "sfx_draw.ogg"], "ready": false },
+    { "key": "sfx_release", "files": ["sfx_release.m4a", "sfx_release.ogg"], "ready": false },
+    { "key": "sfx_hit", "files": ["sfx_hit.m4a", "sfx_hit.ogg"], "ready": false },
+    { "key": "sfx_miss", "files": ["sfx_miss.m4a", "sfx_miss.ogg"], "ready": false },
+    { "key": "sfx_tick", "files": ["sfx_tick.m4a", "sfx_tick.ogg"], "ready": false },
+    { "key": "sfx_win", "files": ["sfx_win.m4a", "sfx_win.ogg"], "ready": false },
+    {
+      "key": "sfx_lose_laugh",
+      "files": ["sfx_lose_laugh.m4a", "sfx_lose_laugh.ogg"],
+      "ready": false
+    },
+    { "key": "sfx_tap", "files": ["sfx_tap.m4a", "sfx_tap.ogg"], "ready": false }
+  ]
+}

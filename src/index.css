@@ -1,0 +1,126 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ink: #0b0705;
+  --color-surface: #24110c;
+  --color-ember: #ff7a1a;
+  --color-gold: #ffc83d;
+  --font-display: Georgia, 'Times New Roman', serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-ink);
+  color: #fff;
+  font-family: system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+a {
+  cursor: pointer;
+}
+
+.card {
+  border: 1px solid rgb(255 255 255 / 0.15);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.07);
+  padding: 1rem;
+}
+
+.sheet::backdrop {
+  background: rgb(0 0 0 / 0.7);
+}
+
+.hero-glow {
+  background: radial-gradient(circle, rgb(255 122 26 / 0.5) 0%, transparent 65%);
+}
+
+.legal h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.legal h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 1.25rem;
+}
+
+.legal p,
+.legal ul,
+.legal ol {
+  margin-top: 0.75rem;
+}
+
+.legal ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.legal ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+
+.win-burst {
+  background: repeating-conic-gradient(rgb(255 200 61 / 0.28) 0 12deg, transparent 12deg 30deg);
+  border-radius: 50%;
+  mask-image: radial-gradient(circle, #000 15%, transparent 68%);
+  animation: burst-in 600ms ease-out both;
+}
+
+.win-boss {
+  transform-origin: bottom;
+  animation: boss-fall 900ms ease-in 150ms both;
+}
+
+@keyframes burst-in {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+
+@keyframes boss-fall {
+  to {
+    transform: rotate(82deg) translateY(30%);
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .win-burst,
+  .win-boss {
+    animation: none;
+  }
+}
+
+/* Set on <html> while /play is mounted. */
+.game-lock,
+.game-lock body {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.rotate-overlay {
+  display: none;
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .rotate-overlay {
+    display: flex;
+  }
+}

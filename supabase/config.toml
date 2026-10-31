@@ -1,0 +1,7 @@
+project_id = "gameit"
+
+[auth.sms]
+enable_signup = true
+
+[functions.auth-embed]
+verify_jwt = false
