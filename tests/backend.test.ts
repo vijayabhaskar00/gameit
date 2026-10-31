@@ -78,7 +78,8 @@ beforeAll(async () => {
   await pg.exec(readFileSync('supabase/migrations/0001_init.sql', 'utf8'));
   await pg.exec(`update campaign_config set value = '"2000-01-01T00:00:00Z"' where key = 'starts_at';
     update campaign_config set value = '"2100-01-01T00:00:00Z"' where key = 'ends_at';`);
-});
+  // PGlite can take over 10 s to boot on a busy machine, and a timeout here skips the whole file.
+}, 60_000);
 
 beforeEach(async () => {
   logged.length = 0;
