@@ -11,7 +11,7 @@ const SIZES = {
 
 // Plain element objects, which satori accepts, so this file needs no JSX setup.
 const el = (type: string, style: object, ...children: unknown[]) =>
-  ({ type, props: { style, children } }) as unknown as ReactElement;
+  ({ type, props: { style: { display: 'flex', ...style }, children } }) as unknown as ReactElement;
 
 export default function handler(req: Request): Response {
   const params = new URL(req.url).searchParams;
