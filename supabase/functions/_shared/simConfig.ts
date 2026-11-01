@@ -27,12 +27,14 @@ export const SIM_CONFIG: SimConfig = {
   ampY: [120, 340],
   // Vertical frequency relative to horizontal, so paths are not plain ellipses.
   freqRatio: [0.6, 1.4],
-  speedStart: 120,
-  speedEnd: 260,
+  // Tuned with `pnpm difficulty`: the +/-6 deg, 300 ms bot wins 12.8% of 5,000 rounds.
+  // Speed alone cannot reach 10-15%, because 6 deg of error misses a small head at any speed.
+  speedStart: 84,
+  speedEnd: 182,
   // Speed reaches speedEnd here and holds for the last 10 s.
   speedRampEndSec: 20,
   speedPerKill: 0.08,
-  headWidth: 130,
+  headWidth: 200,
   hitRadiusFactor: 0.35,
   bowX: WIDTH * 0.5,
   bowY: HEIGHT * 0.88,

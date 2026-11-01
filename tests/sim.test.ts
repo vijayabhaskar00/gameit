@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { createSim, simulate, sin, stepSim } from '@sim';
 import { SIM_CONFIG as c } from '../src/game/config';
-import { perfectBot } from './bot';
+import { humanBot, perfectBot } from './bot';
+
+describe('difficulty', () => {
+  it('the +/-6 deg, 300 ms bot wins 10-15% of 1,000 rounds', () => {
+    let wins = 0;
+    for (let seed = 1; seed <= 1000; seed++) {
+      if (humanBot(seed, c, { errorDeg: 6, reactionTicks: 18 }).endReason === 'win') wins++;
+    }
+    expect(wins).toBeGreaterThanOrEqual(100);
+    expect(wins).toBeLessThanOrEqual(150);
+  });
+});
 
 describe('sim', () => {
   it('sin matches Math.sin', () => {
