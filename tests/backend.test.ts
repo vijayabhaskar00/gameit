@@ -2,22 +2,13 @@ import { readFileSync } from 'node:fs';
 import { PGlite } from '@electric-sql/pglite';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { SIM_CONFIG as c } from '../src/game/config';
-import { finishRound, type FinishDb } from '../supabase/functions/_shared/roundFinish';
+import { finishRound } from '../supabase/functions/_shared/roundFinish';
 import { perfectBot } from './bot';
+import { finishDb, OPEN_CAMPAIGN, PRELUDE, type Query } from './testDb';
 
 // Runs the real migration on PGlite, an in-process Postgres.
-// ponytail: PGlite has one connection, so "parallel" here means queued. Row-lock behaviour
-// needs a real server: rerun against local Supabase once Docker is available.
-const PRELUDE = `
-  create schema auth;
-  create table auth.users (id uuid primary key, phone text);
-  create function auth.uid() returns uuid language sql stable as
-    $$ select nullif(current_setting('test.uid', true), '')::uuid $$;
-  create role anon; create role authenticated; create role service_role;
-  grant usage on schema public, auth to anon, authenticated, service_role;
-  alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
-`;
-
+// ponytail: PGlite has one connection, so "parallel" here means queued. Row locks are
+// covered by `pnpm attack` on a real server.
 const SEED = 7;
 const A = '00000000-0000-4000-8000-00000000000a';
 const B = '00000000-0000-4000-8000-00000000000b';
@@ -26,37 +17,7 @@ const winning = perfectBot(SEED, c);
 let pg: PGlite;
 const logged: string[] = [];
 
-const db: FinishDb = {
-  async getRound(id) {
-    const r = await pg.query<{ user_id: string; seed: string; started_at: Date; status: string }>(
-      'select user_id, seed, started_at, status from rounds where id = $1',
-      [id],
-    );
-    const row = r.rows[0];
-    return row
-      ? { ...row, seed: Number(row.seed), started_at: row.started_at.toISOString() }
-      : null;
-  },
-  async getConfig() {
-    const r = await pg.query<{ key: string; value: unknown }>(
-      'select key, value from campaign_config',
-    );
-    return Object.fromEntries(r.rows.map((row) => [row.key, row.value]));
-  },
-  async reject(id, reason) {
-    await pg.query('select round_reject($1, $2)', [id, reason]);
-  },
-  async finish(a) {
-    const r = await pg.query<{ r: unknown }>('select round_finish($1, $2, $3, $4, $5) as r', [
-      a.roundId,
-      a.userId,
-      JSON.stringify(a.shotLog),
-      a.clientScore,
-      a.score,
-    ]);
-    return r.rows[0]!.r;
-  },
-};
+const db = finishDb(((sql, params) => pg.query(sql, params)) as Query);
 
 const start = async (user = A, seed = SEED) => {
   const r = await pg.query<{ round_id: string }>('select * from round_start($1, $2, 120)', [
@@ -76,8 +37,7 @@ beforeAll(async () => {
   pg = new PGlite();
   await pg.exec(PRELUDE);
   await pg.exec(readFileSync('supabase/migrations/0001_init.sql', 'utf8'));
-  await pg.exec(`update campaign_config set value = '"2000-01-01T00:00:00Z"' where key = 'starts_at';
-    update campaign_config set value = '"2100-01-01T00:00:00Z"' where key = 'ends_at';`);
+  await pg.exec(OPEN_CAMPAIGN);
   // PGlite can take over 10 s to boot on a busy machine, and a timeout here skips the whole file.
 }, 60_000);
 
