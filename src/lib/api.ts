@@ -38,6 +38,23 @@ export interface RoundResult {
 
 export class ApiError extends Error {}
 
+/** Network failures and overload can pass. Any other ApiError is the server's final answer. */
+export const isTransient = (error: unknown): boolean =>
+  !(error instanceof ApiError) || ['server_error', 'rate_limited'].includes(error.message);
+
+/** Runs `call`, waiting each delay in turn after a transient failure. */
+export async function withRetry<T>(call: () => Promise<T>, delaysMs: number[]): Promise<T> {
+  for (const delay of delaysMs) {
+    try {
+      return await call();
+    } catch (error) {
+      if (!isTransient(error)) throw error;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  return call();
+}
+
 export interface Api {
   isLoggedIn(): Promise<boolean>;
   publicConfig(): Promise<{ copy: Copy; campaignOpen: boolean } | null>;

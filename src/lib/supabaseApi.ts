@@ -5,21 +5,30 @@ import type { Session } from './api';
 const url = import.meta.env.VITE_SUPABASE_URL as string;
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 const supabase = createClient(url, anonKey);
+const TIMEOUT_MS = 10_000;
 
 async function call<T>(name: string, body?: unknown): Promise<T> {
   const { data } = await supabase.auth.getSession();
-  const response = await fetch(`${url}/functions/v1/${name}`, {
-    method: body === undefined ? 'GET' : 'POST',
-    headers: {
-      apikey: anonKey,
-      Authorization: `Bearer ${data.session?.access_token ?? anonKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  const json = await response.json();
-  if (!response.ok) throw new ApiError(json.error ?? 'server_error');
-  return json as T;
+  // AbortSignal.timeout is missing on iOS 15, the newest version an original iPhone SE runs.
+  const timeout = new AbortController();
+  const timer = setTimeout(() => timeout.abort(), TIMEOUT_MS);
+  try {
+    const response = await fetch(`${url}/functions/v1/${name}`, {
+      method: body === undefined ? 'GET' : 'POST',
+      headers: {
+        apikey: anonKey,
+        Authorization: `Bearer ${data.session?.access_token ?? anonKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal: timeout.signal,
+    });
+    const json = await response.json();
+    if (!response.ok) throw new ApiError(json.error ?? 'server_error');
+    return json as T;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export const supabaseApi: Api = {

@@ -4,11 +4,14 @@ import { pillWhite } from '../components/ui';
 import { campaign } from '../config/campaign';
 import { createGame, type RoundEnd } from '../game';
 import { SIM_CONFIG } from '../game/config';
-import { api, ApiError, type RoundStart } from '../lib/api';
+import { api, ApiError, isTransient, withRetry, type RoundStart } from '../lib/api';
 import { useSession } from '../lib/session';
 import { track } from '../lib/track';
 
 const TALLY_MIN_MS = 800;
+// With a 10 s timeout on each try, the last one still lands inside the server's 120 s limit.
+const FINISH_RETRY_MS = [1000, 3000, 7000];
+const BLOCKED_GESTURES = ['gesturestart', 'touchmove', 'contextmenu'];
 const blockGesture = (e: Event) => e.preventDefault();
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -28,10 +31,12 @@ export default function Play() {
 
   useEffect(() => {
     document.documentElement.classList.add('game-lock');
-    document.addEventListener('gesturestart', blockGesture);
+    for (const name of BLOCKED_GESTURES) {
+      document.addEventListener(name, blockGesture, { passive: false });
+    }
     return () => {
       document.documentElement.classList.remove('game-lock');
-      document.removeEventListener('gesturestart', blockGesture);
+      for (const name of BLOCKED_GESTURES) document.removeEventListener(name, blockGesture);
     };
   }, []);
 
@@ -74,7 +79,10 @@ export default function Play() {
       });
       try {
         const [result] = await Promise.all([
-          client.roundFinish(started.roundId, ended.shotLog, ended.score),
+          withRetry(
+            () => client.roundFinish(started.roundId, ended.shotLog, ended.score),
+            FINISH_RETRY_MS,
+          ),
           wait(TALLY_MIN_MS),
         ]);
         setSession(await client.session());
@@ -85,14 +93,17 @@ export default function Play() {
           navigate(`/result/${started.roundId}`, { replace: true, state: result });
         }
       } catch (error) {
-        // The earlier try reached the server and only the reply was lost.
-        if (error instanceof ApiError && error.message === 'round_not_started') {
-          setSession(await client.session());
-          navigate(`/result/${started.roundId}`, { replace: true });
-        } else {
+        if (isTransient(error)) {
           track('error', { message: String(error) });
           setPhase('tallyFailed');
+          return;
         }
+        // The round is settled: an earlier try landed and only its reply was lost, or the
+        // server refused it. Retrying cannot change either.
+        const fresh = await client.session().catch(() => null);
+        if (fresh) setSession(fresh);
+        const won = fresh?.reward && ended.score === started.heads;
+        navigate(won ? '/win' : `/result/${started.roundId}`, { replace: true });
       }
     },
     [navigate, setSession],

@@ -115,6 +115,8 @@ export class GameScene extends Phaser.Scene {
     const onChange = () => {
       if (document.hidden) {
         hiddenAt = performance.now();
+        // The finger-up may never arrive, and a stuck drag blocks every later shot.
+        this.cancelDrag();
         return;
       }
       if (hiddenAt === null) return;
