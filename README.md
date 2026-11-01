@@ -16,12 +16,14 @@ pnpm dev        # http://localhost:5173
 
 With `VITE_SUPABASE_URL` empty, `pnpm dev` uses a mock backend in the browser. Any 10-digit number and any 6-digit OTP log you in. Production builds never load the mock.
 
-| Command          | Does                                   |
-| ---------------- | -------------------------------------- |
-| `pnpm test`      | Simulation, anti-cheat, RLS, OG images |
-| `pnpm typecheck` | TypeScript                             |
-| `pnpm lint`      | ESLint                                 |
-| `pnpm build`     | Production build                       |
+| Command                   | Does                                                                   |
+| ------------------------- | ---------------------------------------------------------------------- |
+| `pnpm test`               | Simulation, anti-cheat, RLS, OG images                                 |
+| `pnpm typecheck`          | TypeScript                                                             |
+| `pnpm lint`               | ESLint                                                                 |
+| `pnpm build`              | Production build                                                       |
+| `pnpm difficulty [scale]` | 1,000 bot rounds and their score spread. `scale` multiplies head speed |
+| `pnpm attack`             | Cheat attacks on a real, temporary Postgres server. Needs no Docker    |
 
 Add `?debug=1` to `/play` for FPS, hitboxes, seed and tick. In dev, `?seed=42` fixes the seed.
 
@@ -33,7 +35,8 @@ See [.env.example](.env.example).
 | --------------------------------------------- | ---------------- | ------------------------------ |
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Vercel           | Supabase project               |
 | `VITE_POSTHOG_KEY`, `VITE_POSTHOG_HOST`       | Vercel           | Analytics; off when empty      |
-| `VITE_SENTRY_DSN`, `VITE_RELEASE`             | Vercel           | Errors; off when empty         |
+| `VITE_SENTRY_DSN`                             | Vercel           | Errors; off when empty         |
+| `VITE_RELEASE`, `VITE_SITE_URL`               | Set by build     | Sentry release, preview links  |
 | `HOST_JWT_SECRET`                             | Supabase secrets | Verifies `?token=` from a host |
 | `ALLOWED_ORIGIN`                              | Supabase secrets | CORS; set to your domain       |
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`   | Your shell       | `pnpm coupons` only            |
@@ -53,6 +56,21 @@ In the Supabase dashboard, enable the Phone provider with an SMS gateway. Enable
 ## Deploy to Vercel
 
 Import the repo, set the variables above, and deploy. `vercel.json` handles routing and caching, and `api/og.ts` deploys by itself.
+
+## Launch documents
+
+- [Launch runbook](docs/runbook.md)
+- [Device QA checklist](docs/device-qa.md)
+- [Row Level Security review](docs/rls-review.md)
+
+## Load test
+
+Needs [k6](https://grafana.com/docs/k6/latest/set-up/install-k6/) and a staging project. Follow the note at the top of `scripts/load-users.ts`, then:
+
+```bash
+pnpm load-users 2000
+k6 run -e SUPABASE_URL=<url> -e SUPABASE_ANON_KEY=<key> load/round-pair.js
+```
 
 ## Swap art
 

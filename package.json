@@ -14,7 +14,8 @@
     "format": "prettier --write .",
     "coupons": "node --experimental-strip-types --env-file-if-exists=.env scripts/load-coupons.ts",
     "difficulty": "node --experimental-strip-types --no-warnings scripts/difficulty.ts",
-    "attack": "node --experimental-strip-types --no-warnings scripts/attack.ts"
+    "attack": "node --experimental-strip-types --no-warnings scripts/attack.ts",
+    "load-users": "node --experimental-strip-types --no-warnings --env-file-if-exists=.env scripts/load-users.ts"
   },
   "dependencies": {
     "@sentry/react": "^11.10.0",

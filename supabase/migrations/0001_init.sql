@@ -82,12 +82,12 @@ create policy "read own reward" on rewards for select to authenticated using (us
 create policy "read campaign" on campaign_config for select to anon, authenticated using (true);
 
 create function config_text(p_key text) returns text
-language sql stable as $$
+language sql stable set search_path = public as $$
   select value #>> '{}' from public.campaign_config where key = p_key
 $$;
 
 create function campaign_is_open() returns boolean
-language sql stable as $$
+language sql stable set search_path = public as $$
   select config_text('is_open')::boolean
     and now() >= config_text('starts_at')::timestamptz
     and now() < config_text('ends_at')::timestamptz

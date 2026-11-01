@@ -23,6 +23,8 @@ const server = new EmbeddedPostgres({
   port: PORT,
   persistent: false,
   initdbFlags: ['--encoding=UTF8', '--locale=C'],
+  // On Windows an io_worker outlives server.stop() and keeps the port.
+  postgresFlags: ['-c', 'io_method=sync'],
   onLog: () => {},
   onError: () => {},
 });
